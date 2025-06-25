@@ -5,6 +5,9 @@ from bs4 import BeautifulSoup
 import re
 import os
 import traceback
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
 
 app = Flask(__name__)
 CORS(app)  # Allow requests from any origin (or restrict to GitHub pages if needed)
@@ -31,13 +34,13 @@ def resolve():
             return jsonify({'error': 'No UperBox link found'}), 404
 
         # Get tokenized download link
-        r2 = session.get(uperbox_url, headers=headers)
+        r2 = session.get(uperbox_url, headers=headers, verify=False)
         match = re.search(r'href="(/[^"]*download\?token=[^"]+)"', r2.text)
         if not match:
             return jsonify({'error': 'No tokenized download link found'}), 404
 
         download_url = "https://www.uperbox.net" + match.group(1)
-        r3 = session.get(download_url, headers={"Referer": uperbox_url, "User-Agent": headers["User-Agent"]}, allow_redirects=False)
+        r3 = session.get(download_url, headers=headers2, allow_redirects=False, verify=False)
         final_url = r3.headers.get("Location")
 
         if final_url:
