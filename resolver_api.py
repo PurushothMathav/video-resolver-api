@@ -4,6 +4,7 @@ import requests
 from bs4 import BeautifulSoup
 import re
 import os
+import traceback
 
 app = Flask(__name__)
 CORS(app)  # Allow requests from any origin (or restrict to GitHub pages if needed)
@@ -45,6 +46,7 @@ def resolve():
             return jsonify({'error': 'Failed to resolve final redirect'}), 500
 
     except Exception as e:
+        traceback.print_exc()
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
